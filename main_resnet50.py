@@ -187,7 +187,7 @@ if args.dataset == 'imagenet':
         new_dict = OrderedDict()
         for k in state_dict.keys():
             if not k.startswith("fc"):
-                new_dict[k[17:]] = state_dict[k]
+                new_dict[k[16:]] = state_dict[k]
         model_state_dict = model.state_dict()
         model_state_dict.update(new_dict)
         model.load_state_dict(model_state_dict)
