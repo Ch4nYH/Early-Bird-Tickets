@@ -14,6 +14,7 @@ import models
 from filter import *
 from scipy.ndimage import filters
 from compute_flops import print_model_param_flops
+from collections import OrderedDict
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Slimming CIFAR training')
@@ -182,7 +183,11 @@ else:
 if args.dataset == 'imagenet':
     model = models.__dict__[args.arch](pretrained=False)
     if args.load_model:
-        model.load_state_dict(torch.load(args.load_model)['state_dict'])
+        state_dict = torch.load(args.load_model)['state_dict']
+        new_dict = OrderedDict()
+        for k, v in state_dict:
+            new_dict[k[18:]] = v
+        model.load_state_dict(new_dict)
         
     if args.swa == True:
         swa_n = 0
