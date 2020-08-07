@@ -187,7 +187,7 @@ if args.dataset == 'imagenet':
         new_dict = OrderedDict()
         for k in state_dict.keys():
             new_dict[k[17:]] = state_dict[k]
-        model.load_state_dict(new_dict)
+        model.load_state_dict(new_dict, strict = False)
         
     if args.swa == True:
         swa_n = 0
