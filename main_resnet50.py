@@ -186,7 +186,7 @@ if args.dataset == 'imagenet':
         state_dict = torch.load(args.load_model)['state_dict']
         new_dict = OrderedDict()
         for k in state_dict.keys():
-            if not k.startswith("fc"):
+            if not "fc" in k:
                 new_dict[k[17:]] = state_dict[k]
         model_state_dict = model.state_dict()
         model_state_dict.update(new_dict)
