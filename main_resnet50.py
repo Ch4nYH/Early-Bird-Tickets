@@ -74,6 +74,9 @@ parser.add_argument('--swa', default=False, help='SWALP start epoch')
 parser.add_argument('--swa_start', type=int, default=60, metavar='N',
                     help='SWALP start epoch')
 
+# load pretrained
+parser.add_argument('--load-model', default=None, type=str)
+
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
@@ -178,6 +181,9 @@ else:
 
 if args.dataset == 'imagenet':
     model = models.__dict__[args.arch](pretrained=False)
+    if args.load_model:
+        model.load_state_dict(torch.load(args.load_model))
+        
     if args.swa == True:
         swa_n = 0
         swa_model = models.__dict__[args.arch](pretrained=False)
