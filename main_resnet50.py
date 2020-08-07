@@ -182,7 +182,7 @@ else:
 if args.dataset == 'imagenet':
     model = models.__dict__[args.arch](pretrained=False)
     if args.load_model:
-        model.load_state_dict(torch.load(args.load_model))
+        model.load_state_dict(torch.load(args.load_model)['state_dict'])
         
     if args.swa == True:
         swa_n = 0
