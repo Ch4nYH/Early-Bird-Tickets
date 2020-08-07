@@ -186,7 +186,7 @@ if args.dataset == 'imagenet':
         state_dict = torch.load(args.load_model)['state_dict']
         new_dict = OrderedDict()
         for k in state_dict.keys():
-            new_dict[k[18:]] = state_dict[k]
+            new_dict[k[17:]] = state_dict[k]
         model.load_state_dict(new_dict)
         
     if args.swa == True:
