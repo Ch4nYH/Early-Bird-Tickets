@@ -184,12 +184,8 @@ if args.dataset == 'imagenet':
     model = models.__dict__[args.arch](pretrained=False)
     if args.load_model:
         state_dict = torch.load(args.load_model)['state_dict']
-        new_dict = OrderedDict()
-        for k in state_dict.keys():
-            if not "fc" in k:
-                new_dict[k[17:]] = state_dict[k]
         model_state_dict = model.state_dict()
-        model_state_dict.update(new_dict)
+        model_state_dict.update(state_dict)
         model.load_state_dict(model_state_dict)
         
     if args.swa == True:
