@@ -239,7 +239,7 @@ if args.resume:
 print(model)
 state_dict = model.state_dict()
 for name in state_dict.keys():
-    if 'bn' in name:
+    if 'bn' in name and 'mean' in name:
         weight = state_dict[name]
         length = len(weight)
         sns.barplot(x = list(range(length)), y = weight.cpu().numpy())
