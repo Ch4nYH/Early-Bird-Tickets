@@ -238,3 +238,4 @@ print(model)
 for name, module in model.named_modules():
     if 'bn' in name:
         print(name)
+        print(model['name'].weights)
