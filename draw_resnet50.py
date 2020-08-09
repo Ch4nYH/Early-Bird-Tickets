@@ -242,5 +242,5 @@ for name in state_dict.keys():
     if 'bn' in name and 'mean' in name:
         weight = state_dict[name]
         length = len(weight)
-        sns.barplot(x = list(range(length)), y = weight.cpu().numpy())
+        plt.bar(list(range(length)), weight.cpu().numpy())
         plt.savefig(name + '.jpg')
