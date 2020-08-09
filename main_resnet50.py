@@ -352,7 +352,7 @@ if args.val_cacc:
         constrastive_acc3.update(float(con_acc3), inputs.shape[0])
         constrastive_acc5.update(float(con_acc5), inputs.shape[0])
 
-        if i % args.print_freq == 0:
+        if i % 100 == 0:
             if i == 0:
                 tot = time.time() - t0
                 t1 = tot
