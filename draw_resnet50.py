@@ -236,4 +236,5 @@ if args.resume:
 print(model)
 
 for name, module in model.named_modules():
-    print(name)
+    if 'bn' in name:
+        print(name)
