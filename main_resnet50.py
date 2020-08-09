@@ -272,7 +272,7 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
         
-class CustomImageFolder(ImageFolder):
+class CustomImageFolder(datasets.ImageFolder):
     def __init__(self, **kwds):
         super().__init__(**kwds)
 
