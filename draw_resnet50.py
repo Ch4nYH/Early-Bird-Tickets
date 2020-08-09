@@ -188,32 +188,15 @@ if args.dataset == 'imagenet':
         model_state_dict.update(state_dict)
         model.load_state_dict(model_state_dict)
         
-    if args.swa == True:
-        swa_n = 0
-        swa_model = models.__dict__[args.arch](pretrained=False)
-    if args.scratch:
-        checkpoint = torch.load(args.scratch)
-        if args.dataset == 'imagenet':
-            cfg_input = checkpoint['cfg']
-            model = models.__dict__[args.arch](pretrained=False, cfg=cfg_input)
-            if args.swa == True:
-                swa_model = models.__dict__[args.arch](pretrained=False, cfg=cfg_input)
     if args.cuda:
         model.cuda()
         if args.swa == True:
             swa_model.cuda()
-    if len(args.gpu_ids) > 1:
-        # model = torch.nn.DataParallel(model, device_ids=args.gpu_ids)
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=args.gpu_ids)
-        if args.swa == True:
-            swa_model = torch.nn.parallel.DistributedDataParallel(swa_model, device_ids=args.gpu_ids)
+    
 else:
     model = models.__dict__[args.arch](dataset=args.dataset, depth=args.depth)
     if args.cuda:
         model.cuda()
-    if len(args.gpu_ids) > 1:
-        # model = torch.nn.DataParallel(model, device_ids=args.gpu_ids)
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=args.gpu_ids)
 
 if args.dataset == 'imagenet':
     pruned_flops = print_model_param_flops(model, 224)
