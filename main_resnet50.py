@@ -312,6 +312,7 @@ def contrastive_acc(x, t=0.5, topk=(1,)):
 if args.val_cacc:
     checkpoint = torch.load(args.resume)
     model.load_state_dict(checkpoint['state_dict'])
+    model.eval()
     constrastive_acc1 = AverageMeter()
     constrastive_acc3 = AverageMeter()
     constrastive_acc5 = AverageMeter()
@@ -340,7 +341,7 @@ if args.val_cacc:
         d = inputs.size()
         inputs = inputs.view(d[0] * 2, d[2], d[3], d[4]).cuda()
         with torch.no_grad():
-            features = model.eval()(inputs)
+            features = model(inputs)
         
         con_acc1, con_acc3, con_acc5, = contrastive_acc(features.to('cpu'), t=0.5, topk=(1, 3, 5))
 
