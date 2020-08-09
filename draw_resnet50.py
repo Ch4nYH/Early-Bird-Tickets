@@ -15,7 +15,10 @@ from filter import *
 from scipy.ndimage import filters
 from compute_flops import print_model_param_flops
 from collections import OrderedDict
+import seaborn as sns
 
+import matplotlib
+import matplotlib.pyplot as plt
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Slimming CIFAR training')
 parser.add_argument('--dataset', type=str, default='cifar10',
@@ -237,4 +240,7 @@ print(model)
 state_dict = model.state_dict()
 for name in state_dict.keys():
     if 'bn' in name:
-        print(state_dict[name])
+        weight = state_dict[name]
+        length = len(weight)
+        sns.barplot(x = list(range(length), y = list(weight)))
+        plt.savefig(name + '.jpg')
