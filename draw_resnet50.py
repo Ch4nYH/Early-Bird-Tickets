@@ -234,29 +234,6 @@ if args.resume:
         print("=> no checkpoint found at '{}'".format(args.resume))
         
 print(model)
-    
-history_score = np.zeros((args.epochs, 4))
 
-# additional subgradient descent on the sparsity-induced penalty term
-def updateBN():
-    for m in model.modules():
-        if isinstance(m, nn.BatchNorm2d):
-            if m.weight.grad is not None:
-                m.weight.grad.data.add_(args.s*torch.sign(m.weight.data))  # L1
-
-def accuracy(output, target, topk=(1,)):
-    """Computes the precision@k for the specified values of k"""
-    maxk = max(topk)
-    batch_size = target.size(0)
-
-    _, pred = output.topk(maxk, 1, True, True)
-    pred = pred.t()
-    correct = pred.eq(target.view(1, -1).expand_as(pred))
-
-    res = []
-    for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0)
-        res.append(correct_k.mul_(100.0 / batch_size))
-    return res
-
-
+for name, module in model.named_modules():
+    print(name)
