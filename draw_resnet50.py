@@ -217,27 +217,7 @@ else:
 
 if args.dataset == 'imagenet':
     pruned_flops = print_model_param_flops(model, 224)
-
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
-
-def save_checkpoint(state, is_best, epoch, filepath, is_swa):
-    if is_swa:
-        torch.save(state, os.path.join(filepath, 'swa.pth.tar'))
-    else:
-        if epoch == 'init':
-            filepath = os.path.join(filepath, 'init.pth.tar')
-            torch.save(state, filepath)
-        elif 'EB' in str(epoch):
-            filepath = os.path.join(filepath, epoch+'.pth.tar')
-            torch.save(state, filepath)
-        else:
-            filename = os.path.join(filepath, 'ckpt'+str(epoch)+'.pth.tar')
-            torch.save(state, filename)
-            # filename = os.path.join(filepath, 'ckpt.pth.tar')
-            # torch.save(state, filename)
-            if is_best:
-                shutil.copyfile(filename, os.path.join(filepath, 'model_best.pth.tar'))
-
+    
 if args.resume:
     if os.path.isfile(args.resume):
         print("=> loading checkpoint '{}'".format(args.resume))
@@ -252,9 +232,7 @@ if args.resume:
               .format(args.resume, checkpoint['epoch'], best_prec1))
     else:
         print("=> no checkpoint found at '{}'".format(args.resume))
-else:
-    save_checkpoint({'state_dict': model.state_dict()}, False, epoch='init', filepath=args.save, is_swa=False)
-
+        
 print(model)
     
 history_score = np.zeros((args.epochs, 4))
