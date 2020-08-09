@@ -363,6 +363,7 @@ if args.val_cacc:
                   .format(i, len(train_loader), constrastive_acc1.val, constrastive_acc1.avg, t1 / 60))
 
     print(constrastive_acc1.avg, constrastive_acc3.avg, constrastive_acc5.avg)
+    exit()
     
 history_score = np.zeros((args.epochs, 4))
 
