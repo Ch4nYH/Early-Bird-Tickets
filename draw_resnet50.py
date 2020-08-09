@@ -230,7 +230,7 @@ if args.resume:
         model.load_state_dict(checkpoint['state_dict'])
         if args.swa == True:
             swa_model.load_state_dict(checkpoint['state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
+        #optimizer.load_state_dict(checkpoint['optimizer'])
         print("=> loaded checkpoint '{}' (epoch {}) Prec1: {:f}"
               .format(args.resume, checkpoint['epoch'], best_prec1))
     else:
