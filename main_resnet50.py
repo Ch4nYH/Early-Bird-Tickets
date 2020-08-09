@@ -333,7 +333,7 @@ if args.val_cacc:
         
     train_datasets = CustomImageFolder(root=traindir, transform=tfs_train)
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True,
+        train_datasets, batch_size=args.batch_size, shuffle=True,
         num_workers=16, pin_memory=True)
     for i, (inputs) in enumerate(train_loader):
         
