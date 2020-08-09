@@ -283,6 +283,9 @@ class CustomImageFolder(datasets.ImageFolder):
         imgs = [self.transform(img), self.transform(img)]
         
         return torch.stack(imgs)
+def pair_cosine_similarity(x, eps=1e-8):
+    n = x.norm(p=2, dim=1, keepdim=True)
+    return (x @ x.t()) / (n * n.t()).clamp(min=eps)
 
 def contrastive_acc(x, t=0.5, topk=(1,)):
 
