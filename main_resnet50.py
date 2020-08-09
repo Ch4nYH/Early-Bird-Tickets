@@ -77,7 +77,7 @@ parser.add_argument('--swa_start', type=int, default=60, metavar='N',
 
 # load pretrained
 parser.add_argument('--load-model', default=None, type=str)
-
+parser.add_argument('--val-cacc', action="store_true")
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
@@ -255,6 +255,115 @@ if args.resume:
 else:
     save_checkpoint({'state_dict': model.state_dict()}, False, epoch='init', filepath=args.save, is_swa=False)
 
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+        
+class CustomImageFolder(ImageFolder):
+    def __init__(self, **kwds):
+        super().__init__(**kwds)
+
+    def __getitem__(self, idx):
+        
+        path, target = self.samples[idx]
+        img = self.loader(path)
+        imgs = [self.transform(img), self.transform(img)]
+        
+        return torch.stack(imgs)
+
+def contrastive_acc(x, t=0.5, topk=(1,)):
+
+    maxk = max(topk)
+    batch_size = x.shape[0]
+    target = torch.tensor([i for i in range(batch_size)])
+    x = pair_cosine_similarity(x)
+    for i in range(len(x)): x[i][i] = 0.
+    
+    idx = torch.arange(x.size()[0])
+    # Put positive pairs on the diagonal
+    idx[::2] += 1
+    idx[1::2] -= 1
+    x = x[idx]
+    
+    _, pred = x.topk(maxk, 1, True, True)
+    pred = pred.t()
+    
+    correct = pred.eq(target.view(1, -1).expand_as(pred))
+    res = []
+    for k in topk:
+        correct_k = correct[:k].view(-1).float().sum(0)
+        res.append(correct_k.mul_(100.0 / batch_size))
+    return res
+
+
+if args.val_cacc:
+    checkpoint = torch.load(args.resume)
+    model.load_state_dict(checkpoint['state_dict'])
+    constrastive_acc1 = AverageMeter()
+    constrastive_acc3 = AverageMeter()
+    constrastive_acc5 = AverageMeter()
+
+    t0 = time.time()
+    
+    rnd_color_jitter = transforms.RandomApply([transforms.ColorJitter(0.8, 0.8, 0.8, 0.2)], p=0.8)
+    rnd_gray = transforms.RandomGrayscale(p=0.2)
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                         std=[0.229, 0.224, 0.225])
+
+    tfs_train = transforms.Compose([
+        transforms.RandomResizedCrop(224, scale=(0.08, 1.0)),
+        transforms.RandomHorizontalFlip(),
+        rnd_color_jitter,
+        rnd_gray,
+        transforms.ToTensor(),
+    ])
+        
+    train_datasets = CustomImageFolder(root=traindir, transform=tfs_train)
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset, batch_size=args.batch_size, shuffle=True,
+        num_workers=16, pin_memory=True)
+    for i, (inputs) in enumerate(train_loader):
+        
+        d = inputs.size()
+        inputs = inputs.view(d[0] * 2, d[2], d[3], d[4]).cuda()
+        with torch.no_grad():
+            features = model.eval()(inputs)
+        
+        con_acc1, con_acc3, con_acc5, = contrastive_acc(features.to('cpu'), t=0.5, topk=(1, 3, 5))
+
+        constrastive_acc1.update(float(con_acc1), inputs.shape[0])
+        constrastive_acc3.update(float(con_acc3), inputs.shape[0])
+        constrastive_acc5.update(float(con_acc5), inputs.shape[0])
+
+        if i % args.print_freq == 0:
+            if i == 0:
+                tot = time.time() - t0
+                t1 = tot
+            else:
+                t1 = time.time() - t0 - tot
+                tot = time.time() - t0
+
+            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' | ' +
+                  'Iter: [{}/{}]  '
+                  'Constrastive Acc {:.4f} ({:.4f})  '
+                  'Time: [{:.2f} min]  '
+                  .format(i, len(train_loader), constrastive_acc1.val, constrastive_acc1.avg, t1 / 60))
+
+    print(constrastive_acc1.avg, constrastive_acc3.avg, constrastive_acc5.avg)
+    
 history_score = np.zeros((args.epochs, 4))
 
 # additional subgradient descent on the sparsity-induced penalty term
