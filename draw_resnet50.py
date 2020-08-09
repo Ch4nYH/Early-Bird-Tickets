@@ -9,6 +9,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.autograd import Variable
+from tqdm import tqdm
 
 import models
 from filter import *
@@ -238,7 +239,7 @@ if args.resume:
         
 print(model)
 state_dict = model.state_dict()
-for name in state_dict.keys():
+for name in tqdm(state_dict.keys()):
     if 'bn' in name and 'mean' in name:
         weight = state_dict[name]
         length = len(weight)
