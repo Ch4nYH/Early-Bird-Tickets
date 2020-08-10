@@ -244,6 +244,6 @@ for name in tqdm(state_dict.keys()):
         weight = state_dict[name]
         length = len(weight)
         plt.ylim(-20, 20)
-        plt.bar(list(range(length)), weight.cpu().numpy())
+        plt.bar(list(range(length)), abs(weight.cpu().numpy()))
         plt.savefig(name + '.jpg')
         plt.clf()
