@@ -243,7 +243,7 @@ for name in tqdm(state_dict.keys()):
     if 'bn' in name and 'mean' in name:
         weight = state_dict[name]
         length = len(weight)
-        plt.ylim(0, 100)
+        plt.ylim(0, 2)
         plt.bar(list(range(length)), abs(weight.cpu().numpy()))
         plt.savefig(name + '.jpg')
         plt.clf()
