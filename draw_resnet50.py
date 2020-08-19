@@ -245,5 +245,5 @@ for name in tqdm(state_dict.keys()):
         length = len(weight)
         plt.ylim(0, 1)
         plt.bar(list(range(length)), abs(weight.cpu().numpy()) / max(abs(weight.cpu().numpy())))
-        plt.savefig(name + '.jpg')
+        plt.savefig('img/' + name + '.jpg')
         plt.clf()
