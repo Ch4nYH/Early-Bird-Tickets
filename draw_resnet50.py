@@ -237,7 +237,6 @@ if args.resume:
     else:
         print("=> no checkpoint found at '{}'".format(args.resume))
         
-print(model)
 state_dict = model.state_dict()
 for name in tqdm(state_dict.keys()):
     if 'bn' in name and 'weight' in name:
