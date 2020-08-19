@@ -14,9 +14,9 @@ python -m torch.distributed.launch main_resnet50.py \
 --gpu_ids 0,1,2,3
 
 
-python draw_resnet50.py \
+python -m torch.distributed.launch main_resnet50.py \
 --dataset imagenet \
---data /data3/imagenet-data/raw-data \
+--data /ssd1/bansa01/imagenet_final \
 --arch resnet50_official \
 --depth 50 \
 --lr 0.1 \
@@ -28,4 +28,5 @@ python draw_resnet50.py \
 --momentum 0.9 \
 --sparsity-regularization \
 --gpu_ids 0,1,2,3 \
---load-model ./EBTrain-ImageNet/ResNet50
+--resume ./EBTrain-ImageNet_Moco/ResNet50/ckpt0.pth.tar
+--val-cacc
