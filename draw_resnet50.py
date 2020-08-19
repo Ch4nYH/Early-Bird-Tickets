@@ -102,6 +102,9 @@ print(args.gpu_ids)
 if len(args.gpu_ids) > 0:
    torch.cuda.set_device(args.gpu_ids[0])
 
+os.environ['MASTER_PORT'] = args.port
+torch.distributed.init_process_group(backend="nccl")
+
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 if args.dataset == 'cifar10':
     train_loader = torch.utils.data.DataLoader(
