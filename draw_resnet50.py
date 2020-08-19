@@ -240,7 +240,7 @@ if args.resume:
 print(model)
 state_dict = model.state_dict()
 for name in tqdm(state_dict.keys()):
-    if 'bn' in name and 'mean' in name:
+    if 'bn' in name and 'weight' in name:
         weight = state_dict[name]
         length = len(weight)
         plt.ylim(0, 1)
